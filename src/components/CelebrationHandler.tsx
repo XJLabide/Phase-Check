@@ -59,7 +59,7 @@ export default function CelebrationHandler() {
 
             {/* Celebration badge */}
             <div className="relative animate-scale-in">
-                <div className="bg-[#161b22] border-2 border-[#22c55e] rounded-2xl p-8 shadow-2xl shadow-[#22c55e]/20 text-center">
+                <div className="bg-[#0d1117] border-2 border-[#22c55e] rounded-2xl p-8 shadow-2xl shadow-[#22c55e]/20 text-center">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#22c55e]/20 flex items-center justify-center">
                         <Trophy className="w-10 h-10 text-[#22c55e]" />
                     </div>

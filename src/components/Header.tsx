@@ -2,6 +2,7 @@
 
 import { useTracker } from '@/context/TrackerContext';
 import SearchBar from './SearchBar';
+import AuthButton from './AuthButton';
 import { RotateCcw, EyeOff, Eye } from 'lucide-react';
 
 export default function Header() {
@@ -26,7 +27,7 @@ export default function Header() {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-[#0d1117]/95 backdrop-blur-sm border-b border-[#30363d]">
+        <header className="sticky top-0 z-50 bg-[#06090d]/95 backdrop-blur-sm border-b border-[#1c2128]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
                 <div className="flex items-center justify-between gap-4">
                     {/* Logo */}
@@ -46,24 +47,26 @@ export default function Header() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 flex-shrink-0">
+                        <AuthButton />
+
                         {/* Hide Completed Toggle */}
                         <button
                             onClick={toggleHideCompleted}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${hideCompleted
                                 ? 'bg-[#e53935] text-white'
-                                : 'text-gray-400 hover:text-white hover:bg-[#30363d]'
+                                : 'text-gray-400 hover:text-white hover:bg-[#1c2128]'
                                 }`}
                             title={hideCompleted ? 'Show completed' : 'Hide completed'}
                         >
                             {hideCompleted ? (
                                 <>
-                                    <EyeOff className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Hidden</span>
+                                    <Eye className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Show All</span>
                                 </>
                             ) : (
                                 <>
-                                    <Eye className="w-4 h-4" />
-                                    <span className="hidden sm:inline">All</span>
+                                    <EyeOff className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Hide Watched</span>
                                 </>
                             )}
                         </button>
@@ -71,7 +74,7 @@ export default function Header() {
                         {/* Reset Button */}
                         <button
                             onClick={handleReset}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#30363d] transition-colors text-sm"
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#1c2128] transition-colors text-sm"
                             title="Reset progress"
                         >
                             <RotateCcw className="w-4 h-4" />

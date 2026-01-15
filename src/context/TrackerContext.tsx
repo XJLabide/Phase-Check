@@ -1,7 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useMemo, useCallback, useEffect, useState } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { useToast } from '@/context/ToastContext';
 import {
     MCUContent,
     WatchProgress,
@@ -42,77 +46,180 @@ interface TrackerContextType {
     toggleStatus: (contentId: string) => void;
     setStatus: (contentId: string, status: WatchStatus) => void;
     resetProgress: () => void;
+
+    // Auth
+    user: User | null;
+    isLoading: boolean;
 }
 
 const TrackerContext = createContext<TrackerContextType | undefined>(undefined);
 
 export function TrackerProvider({ children }: { children: React.ReactNode }) {
     const allContent = useMemo(() => getAllContent(), []);
+    const { showToast } = useToast();
 
-    // Persisted state
-    const [progress, setProgress] = useLocalStorage<WatchProgress>('mcu-progress', {});
-    const [preferences, setPreferences] = useLocalStorage<UserPreferences>('mcu-preferences', {
+    // Auth State
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Local Storage (Fallback)
+    const [localProgress, setLocalProgress] = useLocalStorage<WatchProgress>('mcu-progress', {});
+    const [localPreferences, setLocalPreferences] = useLocalStorage<UserPreferences>('mcu-preferences', {
         watchOrder: 'release',
     });
-    const [filters, setFilters] = useLocalStorage<FilterOptions>('mcu-filters', {});
+    const [localFilters, setLocalFilters] = useLocalStorage<FilterOptions>('mcu-filters', {});
+
+    // Active State (either from Firebase or Local)
+    const [progress, setProgressState] = useState<WatchProgress>({});
+    const [preferences, setPreferencesState] = useState<UserPreferences>({ watchOrder: 'release' });
+    const [filters, setFiltersState] = useState<FilterOptions>({});
+
+    // Auth Listener
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            setUser(currentUser);
+            setIsLoading(true);
+
+            if (currentUser) {
+                // User logged in - Sync with Firestore
+                const userRef = doc(db, 'users', currentUser.uid);
+
+                // Realtime subscription
+                const unsubDoc = onSnapshot(
+                    userRef,
+                    (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            setProgressState(data.progress || {});
+                            setPreferencesState(data.preferences || { watchOrder: 'release' });
+                            setFiltersState(data.filters || {});
+                        } else {
+                            // New user document - Initialize with empty or local state?
+                            // For now, let's keep it empty to allow "clean slate" on cloud
+                            // OR we could merge local state here if we wanted "guest -> user" migration
+                        }
+                        setIsLoading(false);
+                    },
+                    (error) => {
+                        // Handle permission errors gracefully (e.g., user logged out mid-session)
+                        console.warn('Firestore subscription error:', error.code);
+                        setProgressState(localProgress);
+                        setPreferencesState(localPreferences);
+                        setFiltersState(localFilters);
+                        setIsLoading(false);
+                    }
+                );
+
+                return () => unsubDoc();
+            } else {
+                // User logged out - Switch to Local Storage
+                setProgressState(localProgress);
+                setPreferencesState(localPreferences);
+                setFiltersState(localFilters);
+                setIsLoading(false);
+            }
+        });
+
+        return () => unsubscribe();
+    }, [localProgress, localPreferences, localFilters]);
+
+    // Sync helpers
+    const updateProgress = useCallback(async (newProgress: WatchProgress) => {
+        setProgressState(newProgress);
+
+        if (user) {
+            try {
+                await setDoc(doc(db, 'users', user.uid), {
+                    progress: newProgress,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (error) {
+                console.error('Error saving progress:', error);
+                showToast('Failed to save progress', 'success'); // Using success style for error to handle toast type limitation if any
+            }
+        } else {
+            setLocalProgress(newProgress);
+        }
+    }, [user, setLocalProgress, showToast]);
+
+    const updatePreferences = useCallback(async (newPreferences: UserPreferences) => {
+        setPreferencesState(newPreferences);
+
+        if (user) {
+            try {
+                await setDoc(doc(db, 'users', user.uid), {
+                    preferences: newPreferences
+                }, { merge: true });
+            } catch (error) {
+                console.error('Error saving preferences:', error);
+            }
+        } else {
+            setLocalPreferences(newPreferences);
+        }
+    }, [user, setLocalPreferences]);
+
+    const updateFilters = useCallback(async (newFilters: FilterOptions) => {
+        setFiltersState(newFilters);
+
+        if (user) {
+            try {
+                await setDoc(doc(db, 'users', user.uid), {
+                    filters: newFilters
+                }, { merge: true });
+            } catch (error) {
+                console.error('Error saving filters:', error);
+            }
+        } else {
+            setLocalFilters(newFilters);
+        }
+    }, [user, setLocalFilters]);
+
 
     // Watch order
     const watchOrder = preferences.watchOrder;
     const setWatchOrder = useCallback((order: WatchOrderType) => {
-        setPreferences(prev => ({ ...prev, watchOrder: order }));
-    }, [setPreferences]);
+        updatePreferences({ ...preferences, watchOrder: order });
+    }, [updatePreferences, preferences]);
+
+    const setFilters = useCallback((newFilters: FilterOptions) => {
+        updateFilters(newFilters);
+    }, [updateFilters]);
 
     // Toggle status through: not_started -> watching -> completed -> not_started
     const toggleStatus = useCallback((contentId: string) => {
-        setProgress(prev => {
-            const current = prev[contentId] || 'not_started';
-            let next: WatchStatus;
+        const current = progress[contentId] || 'not_started';
+        let next: WatchStatus;
 
-            // Find content type to determine flow
-            const content = allContent.find(c => c.id === contentId);
+        // Find content type to determine flow
+        const content = allContent.find(c => c.id === contentId);
 
-            if (content?.type === 'series') {
-                // For series: not_started -> watching -> completed -> not_started
-                switch (current) {
-                    case 'not_started':
-                        next = 'watching';
-                        break;
-                    case 'watching':
-                        next = 'completed';
-                        break;
-                    case 'completed':
-                        next = 'not_started';
-                        break;
-                    default:
-                        next = 'not_started';
-                }
-            } else {
-                // For movies/specials: not_started -> completed -> not_started
-                switch (current) {
-                    case 'not_started':
-                        next = 'completed';
-                        break;
-                    case 'completed':
-                        next = 'not_started';
-                        break;
-                    default:
-                        next = 'completed';
-                }
+        if (content?.type === 'series') {
+            switch (current) {
+                case 'not_started': next = 'watching'; break;
+                case 'watching': next = 'completed'; break;
+                case 'completed': next = 'not_started'; break;
+                default: next = 'not_started';
             }
+        } else {
+            switch (current) {
+                case 'not_started': next = 'completed'; break;
+                case 'completed': next = 'not_started'; break;
+                default: next = 'completed';
+            }
+        }
 
-            return { ...prev, [contentId]: next };
-        });
-    }, [setProgress, allContent]);
+        updateProgress({ ...progress, [contentId]: next });
+    }, [progress, allContent, updateProgress]);
 
     // Set specific status
     const setStatus = useCallback((contentId: string, status: WatchStatus) => {
-        setProgress(prev => ({ ...prev, [contentId]: status }));
-    }, [setProgress]);
+        updateProgress({ ...progress, [contentId]: status });
+    }, [progress, updateProgress]);
 
     // Reset all progress
     const resetProgress = useCallback(() => {
-        setProgress({});
-    }, [setProgress]);
+        updateProgress({});
+    }, [updateProgress]);
 
     // Computed values
     const displayedContent = useMemo(() => {
@@ -147,6 +254,8 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         toggleStatus,
         setStatus,
         resetProgress,
+        user,
+        isLoading
     };
 
     return (

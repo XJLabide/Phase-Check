@@ -453,7 +453,7 @@
             "releaseDate": "2022-06-08",
             "episodes": 6,
             "description": "Kamala Khan is a superfan who gains extraordinary powers.",
-            "poster": "https://image.tmdb.org/t/p/w500/cdkyMYdu8ao26XN8KJLM3UntytY.jpg"
+            "poster": "https://m.media-amazon.com/images/M/MV5BNzlkNjBmOWUtOTgzZS00OWIzLThkNWEtZTg5MGY2ODAyYzZjXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
         },
         {
             "id": "thor-love-and-thunder",
@@ -479,7 +479,7 @@
             "releaseDate": "2022-08-10",
             "episodes": 5,
             "description": "Follow Baby Groot's adventures as he grows up in the galaxy.",
-            "poster": "https://image.tmdb.org/t/p/w500/b0vJzk7gJYW2pqwGJVF56bL9FQc.jpg"
+            "poster": "https://cdn.marvel.com/content/1x/iamgroot_poster.jpg"
         },
         {
             "id": "she-hulk",
@@ -505,7 +505,7 @@
             "releaseDate": "2022-10-07",
             "runtime": 52,
             "description": "Monster hunters gather at a secret ceremony.",
-            "poster": "https://image.tmdb.org/t/p/w500/jmVkypRk20K1BShC9w10xGvG8fH.jpg"
+            "poster": "https://image.tmdb.org/t/p/w500/mvIvNKRIJPPS7WSFarFhOAGIVnU.jpg"
         },
         {
             "id": "black-panther-wakanda-forever",
@@ -531,7 +531,7 @@
             "releaseDate": "2022-11-25",
             "runtime": 44,
             "description": "The Guardians go to Earth to get Peter the perfect Christmas gift.",
-            "poster": "https://image.tmdb.org/t/p/w500/8dqXyslZ2hv79p4yXc4Sb2Nt30c.jpg"
+            "poster": "https://posterspy.com/wp-content/uploads/2022/05/GOTG-Holiday-Special-Poster_MS_Final_72dpi-1200x1800.png"
         },
         {
             "id": "ant-man-quantumania",
@@ -583,7 +583,7 @@
             "releaseDate": "2023-10-05",
             "episodes": 6,
             "description": "Loki continues his journey through the TVA.",
-            "poster": "https://image.tmdb.org/t/p/w500/8bcoRX3hQRHufLPGRdv1IN0GPNd.jpg"
+            "poster": "https://image.tmdb.org/t/p/w500/voHUmluYmKyleFkTu3lOXQG702u.jpg"
         },
         {
             "id": "the-marvels",
@@ -609,7 +609,7 @@
             "releaseDate": "2023-12-22",
             "episodes": 9,
             "description": "More alternate realities of the MCU are explored.",
-            "poster": "https://image.tmdb.org/t/p/w500/1Uksj4PYJkVMK96ct2D8lkMZ2uJ.jpg"
+            "poster": "https://image.tmdb.org/t/p/w500/lztz5XBMG1x6Y5ubz7CxfPFsAcW.jpg"
         },
         {
             "id": "echo",
@@ -622,7 +622,7 @@
             "releaseDate": "2024-01-09",
             "episodes": 5,
             "description": "Maya Lopez returns to her hometown and confronts her past.",
-            "poster": "https://image.tmdb.org/t/p/w500/vGXptEdGlBqMbCMebPVg7jAbRwD.jpg"
+            "poster": "https://image.tmdb.org/t/p/w500/fKqA4rgVJwrM7Gb3tQ9TGHnu8Tr.jpg"
         },
         {
             "id": "deadpool-wolverine",
@@ -648,7 +648,7 @@
             "releaseDate": "2024-09-18",
             "episodes": 9,
             "description": "Agatha Harkness gathers a coven to walk the Witches' Road.",
-            "poster": "https://image.tmdb.org/t/p/w500/dCTlKx0ggFjpQdpwjBGTkNOgeRP.jpg"
+            "poster": "https://m.media-amazon.com/images/M/MV5BMDcyZTNjOTEtNzc5Yy00Y2UzLThkMWYtNTY4YmM4OWI5OTMzXkEyXkFqcGc@._V1_.jpg    "
         },
         {
             "id": "what-if-season-3",
@@ -661,7 +661,7 @@
             "releaseDate": "2024-12-22",
             "episodes": 8,
             "description": "The final season explores more alternate MCU realities.",
-            "poster": "https://image.tmdb.org/t/p/w500/x9Y0S1nOz5xqzLGbZmvfGbLfzuL.jpg"
+            "poster": "https://image.tmdb.org/t/p/w500/lztz5XBMG1x6Y5ubz7CxfPFsAcW.jpg"
         }
     ]
 }

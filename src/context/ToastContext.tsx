@@ -1,12 +1,12 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { CheckCircle2, X, Undo2 } from 'lucide-react';
+import { CheckCircle2, X, Undo2, AlertCircle } from 'lucide-react';
 
 interface Toast {
     id: string;
     message: string;
-    type: 'success' | 'info' | 'warning';
+    type: 'success' | 'info' | 'warning' | 'error';
     undoAction?: () => void;
 }
 
@@ -63,10 +63,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 {toasts.map((toast) => (
                     <div
                         key={toast.id}
-                        className="flex items-center gap-3 px-4 py-3 bg-[#161b22] border border-[#30363d] rounded-lg shadow-lg animate-slide-up min-w-[280px] max-w-[400px]"
+                        className="flex items-center gap-3 px-4 py-3 bg-[#0d1117] border border-[#1c2128] rounded-lg shadow-lg animate-slide-up min-w-[280px] max-w-[400px]"
                     >
-                        <CheckCircle2 className={`w-5 h-5 flex-shrink-0 ${toast.type === 'success' ? 'text-[#22c55e]' : 'text-gray-400'
-                            }`} />
+                        {toast.type === 'error' ? (
+                            <AlertCircle className="w-5 h-5 flex-shrink-0 text-[#e53935]" />
+                        ) : (
+                            <CheckCircle2 className={`w-5 h-5 flex-shrink-0 ${toast.type === 'success' ? 'text-[#22c55e]' : 'text-gray-400'
+                                }`} />
+                        )}
 
                         <span className="flex-1 text-sm text-white">{toast.message}</span>
 

@@ -55,7 +55,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d1117]">
+    <div className="min-h-screen bg-[#06090d]">
       <Header />
       <CelebrationHandler />
 
@@ -63,63 +63,55 @@ export default function Home() {
         {/* Hero Section - Progress + Next Up */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
           {/* Left - Circular Progress (Captain America Shield Style) */}
-          <div className="bg-[#161b22] rounded-xl p-6 flex flex-col items-center justify-center border border-[#30363d]">
+          <div className="bg-[#0d1117] rounded-xl p-6 flex flex-col items-center justify-center border border-[#1c2128]">
             <div className="relative w-36 h-36 mb-4">
-              {/* Shield background rings */}
-              <svg className="w-full h-full" viewBox="0 0 36 36">
-                {/* Outer red ring (background) */}
-                <circle cx="18" cy="18" r="17" fill="none" stroke="#30363d" strokeWidth="2" />
-                {/* Middle white ring */}
-                <circle cx="18" cy="18" r="13" fill="none" stroke="#30363d" strokeWidth="2" />
-                {/* Inner blue ring */}
-                <circle cx="18" cy="18" r="9" fill="none" stroke="#30363d" strokeWidth="2" />
-                {/* Blue center */}
-                <circle cx="18" cy="18" r="5" fill="#30363d" />
-              </svg>
+              {(() => {
+                const clipY = 36 - (36 * stats.overall / 100);
+                const isComplete = stats.overall === 100;
+                return (
+                  <svg className="w-full h-full" viewBox="0 0 36 36">
+                    <defs>
+                      <clipPath id="heroProgressClip">
+                        <rect
+                          x="0"
+                          y={clipY}
+                          width="36"
+                          height={36 - clipY}
+                          className="transition-all duration-700 ease-out"
+                        />
+                      </clipPath>
+                    </defs>
 
-              {/* Progress overlay */}
-              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
-                {/* Red progress (outer) */}
-                <circle
-                  cx="18" cy="18" r="17"
-                  fill="none"
-                  stroke="#e53935"
-                  strokeWidth="2"
-                  strokeDasharray={`${stats.overall} 100`}
-                  strokeLinecap="round"
-                  className="transition-all duration-700"
-                />
-                {/* White progress (middle) */}
-                <circle
-                  cx="18" cy="18" r="13"
-                  fill="none"
-                  stroke="#ffffff"
-                  strokeWidth="2"
-                  strokeDasharray={`${stats.overall} 100`}
-                  strokeLinecap="round"
-                  className="transition-all duration-700"
-                  style={{ transitionDelay: '100ms' }}
-                />
-                {/* Blue progress (inner) */}
-                <circle
-                  cx="18" cy="18" r="9"
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="2"
-                  strokeDasharray={`${stats.overall} 100`}
-                  strokeLinecap="round"
-                  className="transition-all duration-700"
-                  style={{ transitionDelay: '200ms' }}
-                />
-                {/* Blue center fill */}
-                <circle cx="18" cy="18" r="5" fill={stats.overall > 0 ? '#3b82f6' : '#30363d'} className="transition-all duration-700" />
-              </svg>
+                    {/* Gray base shield (always visible) */}
+                    <g className="shield-gray">
+                      <circle cx="18" cy="18" r="17" fill="#374151" stroke="#4b5563" strokeWidth="0.3" />
+                      <circle cx="18" cy="18" r="13" fill="#4b5563" stroke="#6b7280" strokeWidth="0.3" />
+                      <circle cx="18" cy="18" r="9" fill="#6b7280" stroke="#9ca3af" strokeWidth="0.3" />
+                      <circle cx="18" cy="18" r="5" fill="#9ca3af" />
+                      <polygon
+                        points="18,14 19.2,16.5 22,16.8 20,18.7 20.5,21.5 18,20 15.5,21.5 16,18.7 14,16.8 16.8,16.5"
+                        fill="#d1d5db"
+                      />
+                    </g>
 
-              {/* Center star and text */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold text-white">{stats.overall}%</span>
-              </div>
+                    {/* Colored shield (clipped to show based on progress) */}
+                    <g clipPath="url(#heroProgressClip)">
+                      <circle cx="18" cy="18" r="17" fill={isComplete ? '#22c55e' : '#e53935'} />
+                      <circle cx="18" cy="18" r="13" fill={isComplete ? '#86efac' : '#ffffff'} />
+                      <circle cx="18" cy="18" r="9" fill={isComplete ? '#22c55e' : '#3b82f6'} />
+                      <circle cx="18" cy="18" r="5" fill={isComplete ? '#16a34a' : '#1d4ed8'} />
+                      <polygon
+                        points="18,14 19.2,16.5 22,16.8 20,18.7 20.5,21.5 18,20 15.5,21.5 16,18.7 14,16.8 16.8,16.5"
+                        fill="#ffffff"
+                      />
+                    </g>
+                  </svg>
+                );
+              })()}
             </div>
+
+            {/* Percentage below shield */}
+            <span className="text-2xl font-bold text-white mb-2">{stats.overall}%</span>
             <p className="text-gray-400 text-sm">
               {stats.totalItems - stats.totalCompleted} titles remaining
             </p>
@@ -135,7 +127,7 @@ export default function Home() {
           </div>
 
           {/* Right - Next Up Card */}
-          <div className="lg:col-span-2 bg-[#161b22] rounded-xl overflow-hidden border border-[#30363d] relative">
+          <div className="lg:col-span-2 bg-[#0d1117] rounded-xl overflow-hidden border border-[#1c2128] relative">
             {nextToWatch?.poster && (
               <div
                 className="absolute inset-0 opacity-20"
@@ -159,7 +151,7 @@ export default function Home() {
                         className="w-full aspect-[2/3] object-cover"
                       />
                     ) : (
-                      <div className="w-full aspect-[2/3] bg-[#30363d] flex items-center justify-center">
+                      <div className="w-full aspect-[2/3] bg-[#1c2128] flex items-center justify-center">
                         <Film className="w-8 h-8 text-gray-500" />
                       </div>
                     )}
@@ -257,7 +249,7 @@ export default function Home() {
         </section>
 
         {/* Filters Row */}
-        <section className="bg-[#161b22] rounded-xl p-4 border border-[#30363d] mb-6">
+        <section className="bg-[#0d1117] rounded-xl p-4 border border-[#1c2128] mb-6">
           <div className="flex flex-wrap items-center gap-4 text-sm">
             {/* Watch Order */}
             <div className="flex items-center gap-2">
@@ -265,7 +257,7 @@ export default function Home() {
               <button
                 onClick={() => setWatchOrder('release')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${watchOrder === 'release'
-                  ? 'bg-[#30363d] text-white'
+                  ? 'bg-[#1c2128] text-white'
                   : 'text-gray-400 hover:text-white'
                   }`}
               >
@@ -284,7 +276,7 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="w-px h-6 bg-[#30363d] hidden sm:block" />
+            <div className="w-px h-6 bg-[#1c2128] hidden sm:block" />
 
             {/* Phase */}
             <div className="flex items-center gap-2">
@@ -302,7 +294,7 @@ export default function Home() {
               />
             </div>
 
-            <div className="w-px h-6 bg-[#30363d] hidden sm:block" />
+            <div className="w-px h-6 bg-[#1c2128] hidden sm:block" />
 
             {/* Format */}
             <div className="flex items-center gap-2">
@@ -332,8 +324,8 @@ export default function Home() {
           </section>
         ) : (
           /* Flat Chronological List */
-          <section className="bg-[#161b22] rounded-xl border border-[#30363d] overflow-hidden">
-            <div className="p-4 border-b border-[#30363d]">
+          <section className="bg-[#0d1117] rounded-xl border border-[#1c2128] overflow-hidden">
+            <div className="p-4 border-b border-[#1c2128]">
               <h2 className="font-semibold text-white flex items-center gap-2">
                 <Clock className="w-5 h-5 text-[#e53935]" />
                 Chronological Order
@@ -385,7 +377,7 @@ function StatCard({
   subtext?: string;
 }) {
   return (
-    <div className="bg-[#161b22] rounded-xl p-4 border border-[#30363d]">
+    <div className="bg-[#0d1117] rounded-xl p-4 border border-[#1c2128]">
       <div className="flex items-start gap-3">
         <div className={`w-10 h-10 rounded-lg ${iconBg} flex items-center justify-center ${iconColor}`}>
           {icon}
@@ -416,7 +408,7 @@ function PhaseFilter({
     <div className="flex items-center gap-1">
       <button
         onClick={() => onToggle(0 as Phase)} // Clear all
-        className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${isAll ? 'bg-[#30363d] text-white' : 'text-gray-400 hover:text-white'
+        className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${isAll ? 'bg-[#1c2128] text-white' : 'text-gray-400 hover:text-white'
           }`}
       >
         All
@@ -426,7 +418,7 @@ function PhaseFilter({
           key={phase}
           onClick={() => onToggle(phase)}
           className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${selected?.includes(phase)
-            ? 'bg-[#30363d] text-white'
+            ? 'bg-[#1c2128] text-white'
             : 'text-gray-400 hover:text-white'
             }`}
         >
@@ -458,7 +450,7 @@ function FormatFilter({
     <div className="flex items-center gap-1">
       <button
         onClick={onClear}
-        className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${isAll ? 'bg-[#30363d] text-white' : 'text-gray-400 hover:text-white'
+        className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${isAll ? 'bg-[#1c2128] text-white' : 'text-gray-400 hover:text-white'
           }`}
       >
         All
@@ -468,7 +460,7 @@ function FormatFilter({
           key={type}
           onClick={() => onToggle(type)}
           className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${selected?.includes(type)
-            ? 'bg-[#30363d] text-white'
+            ? 'bg-[#1c2128] text-white'
             : 'text-gray-400 hover:text-white'
             }`}
         >

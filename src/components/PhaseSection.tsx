@@ -46,7 +46,7 @@ export default function PhaseSection({ phase }: PhaseSectionProps) {
     }
 
     return (
-        <div className="bg-[#161b22] rounded-xl overflow-hidden border border-[#30363d]">
+        <div className="bg-[#0d1117] rounded-xl overflow-hidden border border-[#1c2128]">
             {/* Header */}
             <button
                 className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
@@ -71,7 +71,7 @@ export default function PhaseSection({ phase }: PhaseSectionProps) {
                 <div className="flex items-center gap-4">
                     {/* Progress Bar */}
                     <div className="hidden sm:flex items-center gap-3">
-                        <div className="w-32 h-1.5 bg-[#30363d] rounded-full overflow-hidden">
+                        <div className="w-32 h-1.5 bg-[#1c2128] rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-[#e53935] rounded-full transition-all duration-500"
                                 style={{ width: `${phaseProgress}%` }}

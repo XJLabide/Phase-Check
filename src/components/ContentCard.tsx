@@ -55,7 +55,7 @@ export default function ContentCard({ content }: ContentCardProps) {
 
     return (
         <div
-            className={`bg-[#0d1117] rounded-lg cursor-pointer group relative overflow-hidden transition-all duration-200 border border-[#30363d] hover:border-[#e53935]/50 ${status === 'completed' ? 'opacity-50' : ''
+            className={`bg-[#06090d] rounded-lg cursor-pointer group relative overflow-hidden transition-all duration-200 border border-[#1c2128] hover:border-[#e53935]/50 ${status === 'completed' ? 'opacity-50' : ''
                 }`}
             onClick={handleClick}
         >
@@ -72,7 +72,7 @@ export default function ContentCard({ content }: ContentCardProps) {
                                 loading="lazy"
                             />
                         ) : (
-                            <div className="w-full h-full bg-[#30363d] flex items-center justify-center text-gray-500">
+                            <div className="w-full h-full bg-[#1c2128] flex items-center justify-center text-gray-500">
                                 {getTypeIcon()}
                             </div>
                         )}
@@ -80,9 +80,9 @@ export default function ContentCard({ content }: ContentCardProps) {
 
                     {/* Status indicator */}
                     <div
-                        className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#0d1117] transition-colors ${status === 'completed' ? 'bg-[#22c55e]' :
-                                status === 'watching' ? 'bg-amber-500' :
-                                    'bg-[#30363d] group-hover:bg-[#e53935]'
+                        className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#06090d] transition-colors ${status === 'completed' ? 'bg-[#22c55e]' :
+                            status === 'watching' ? 'bg-amber-500' :
+                                'bg-[#1c2128] group-hover:bg-[#e53935]'
                             }`}
                     >
                         {status === 'completed' ? (
@@ -97,7 +97,7 @@ export default function ContentCard({ content }: ContentCardProps) {
 
                 {/* Content Info */}
                 <div className="flex-1 min-w-0 py-0.5">
-                    <h3 className={`font-medium text-sm leading-tight mb-1 ${status === 'completed' ? 'text-gray-500 line-through' : 'text-white'
+                    <h3 className={`font-medium text-sm leading-tight mb-1 ${status === 'completed' ? 'text-gray-500' : 'text-white'
                         }`}>
                         {content.title}
                     </h3>
