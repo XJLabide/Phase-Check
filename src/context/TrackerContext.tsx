@@ -14,6 +14,7 @@ import {
     UserPreferences,
     FilterOptions,
     ProgressStats,
+    WatchTimeStats,
     Phase
 } from '@/lib/types';
 import {
@@ -34,6 +35,7 @@ interface TrackerContextType {
     // Progress
     progress: WatchProgress;
     stats: ProgressStats;
+    watchTimeStats: WatchTimeStats;
     nextToWatch: MCUContent | null;
 
     // Preferences
@@ -46,6 +48,7 @@ interface TrackerContextType {
     toggleStatus: (contentId: string) => void;
     setStatus: (contentId: string, status: WatchStatus) => void;
     resetProgress: () => void;
+    markPhaseComplete: (phase: Phase) => void;
 
     // Auth
     user: User | null;
@@ -221,6 +224,16 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         updateProgress({});
     }, [updateProgress]);
 
+    // Mark entire phase as complete
+    const markPhaseComplete = useCallback((phase: Phase) => {
+        const phaseContent = allContent.filter(c => c.phase === phase);
+        const newProgress = { ...progress };
+        phaseContent.forEach(c => {
+            newProgress[c.id] = 'completed';
+        });
+        updateProgress(newProgress);
+    }, [allContent, progress, updateProgress]);
+
     // Computed values
     const displayedContent = useMemo(() => {
         const sorted = sortByOrder(allContent, watchOrder, preferences.customOrder);
@@ -236,6 +249,32 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         return calculateProgress(allContent, progress);
     }, [allContent, progress]);
 
+    // Calculate watch time stats
+    const watchTimeStats = useMemo((): WatchTimeStats => {
+        const AVERAGE_EPISODE_RUNTIME = 45; // minutes
+
+        let totalWatched = 0;
+        let totalRemaining = 0;
+
+        allContent.forEach(content => {
+            const runtime = content.runtime || (content.episodes ? content.episodes * AVERAGE_EPISODE_RUNTIME : 0);
+            const status = progress[content.id];
+
+            if (status === 'completed') {
+                totalWatched += runtime;
+            } else {
+                totalRemaining += runtime;
+            }
+        });
+
+        return {
+            totalMinutesWatched: totalWatched,
+            totalMinutesRemaining: totalRemaining,
+            averageMinutesPerDay: 0, // Could calculate based on watch history
+            estimatedCompletionDate: undefined,
+        };
+    }, [allContent, progress]);
+
     const nextToWatch = useMemo(() => {
         return getNextToWatch(allContent, progress, watchOrder, preferences.customOrder);
     }, [allContent, progress, watchOrder, preferences.customOrder]);
@@ -246,6 +285,7 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         contentByPhase,
         progress,
         stats,
+        watchTimeStats,
         nextToWatch,
         watchOrder,
         setWatchOrder,
@@ -254,6 +294,7 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
         toggleStatus,
         setStatus,
         resetProgress,
+        markPhaseComplete,
         user,
         isLoading
     };

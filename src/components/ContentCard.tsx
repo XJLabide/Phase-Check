@@ -4,13 +4,14 @@ import { MCUContent, WatchStatus } from '@/lib/types';
 import { useTracker } from '@/context/TrackerContext';
 import { useToast } from '@/context/ToastContext';
 import { formatRuntime } from '@/lib/utils';
-import { CheckCircle2, Circle, PlayCircle, Film, Tv, Star, Clock } from 'lucide-react';
+import { CheckCircle2, Circle, PlayCircle, Film, Tv, Star, Clock, Info } from 'lucide-react';
 
 interface ContentCardProps {
     content: MCUContent;
+    onOpenDetail?: (content: MCUContent) => void;
 }
 
-export default function ContentCard({ content }: ContentCardProps) {
+export default function ContentCard({ content, onOpenDetail }: ContentCardProps) {
     const { progress, toggleStatus } = useTracker();
     const { showToast } = useToast();
     const status: WatchStatus = progress[content.id] || 'not_started';
@@ -26,7 +27,8 @@ export default function ContentCard({ content }: ContentCardProps) {
         }
     };
 
-    const handleClick = () => {
+    const handleStatusClick = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent card click
         const previousStatus = status;
         toggleStatus(content.id);
 
@@ -53,11 +55,17 @@ export default function ContentCard({ content }: ContentCardProps) {
         });
     };
 
+    const handleCardClick = () => {
+        if (onOpenDetail) {
+            onOpenDetail(content);
+        }
+    };
+
     return (
         <div
             className={`bg-[#06090d] rounded-lg cursor-pointer group relative overflow-hidden transition-all duration-200 border border-[#1c2128] hover:border-[#e53935]/50 ${status === 'completed' ? 'opacity-50' : ''
                 }`}
-            onClick={handleClick}
+            onClick={handleCardClick}
         >
             <div className="flex gap-3 p-3">
                 {/* Poster */}
@@ -78,12 +86,14 @@ export default function ContentCard({ content }: ContentCardProps) {
                         )}
                     </div>
 
-                    {/* Status indicator */}
-                    <div
-                        className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#06090d] transition-colors ${status === 'completed' ? 'bg-[#22c55e]' :
+                    {/* Status indicator - clickable */}
+                    <button
+                        onClick={handleStatusClick}
+                        className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#06090d] transition-colors hover:scale-110 ${status === 'completed' ? 'bg-[#22c55e]' :
                             status === 'watching' ? 'bg-amber-500' :
                                 'bg-[#1c2128] group-hover:bg-[#e53935]'
                             }`}
+                        title={status === 'completed' ? 'Mark as unwatched' : status === 'watching' ? 'Mark as completed' : 'Mark as watched'}
                     >
                         {status === 'completed' ? (
                             <CheckCircle2 className="w-3 h-3 text-white" />
@@ -92,7 +102,7 @@ export default function ContentCard({ content }: ContentCardProps) {
                         ) : (
                             <Circle className="w-3 h-3 text-gray-500 group-hover:text-white" />
                         )}
-                    </div>
+                    </button>
                 </div>
 
                 {/* Content Info */}
@@ -114,16 +124,18 @@ export default function ContentCard({ content }: ContentCardProps) {
                     </div>
                 </div>
 
-                {/* Status Badge */}
-                <div className="flex-shrink-0 self-center">
+                {/* Status Badge & Info Icon */}
+                <div className="flex-shrink-0 self-center flex items-center gap-2">
                     {status === 'completed' && (
                         <span className="text-[10px] text-[#22c55e] font-medium">Watched</span>
                     )}
                     {status === 'watching' && (
                         <span className="text-[10px] text-amber-400 font-medium">Watching</span>
                     )}
+                    <Info className="w-4 h-4 text-gray-600 group-hover:text-[#e53935] transition-colors" />
                 </div>
             </div>
         </div>
     );
 }
+

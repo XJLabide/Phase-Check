@@ -1,11 +1,13 @@
 'use client';
 
-import { Phase, WatchStatus } from '@/lib/types';
+import { useState } from 'react';
+import { Phase, WatchStatus, MCUContent } from '@/lib/types';
 import { useTracker } from '@/context/TrackerContext';
 import { useToast } from '@/context/ToastContext';
 import Header from '@/components/Header';
 import PhaseSection from '@/components/PhaseSection';
 import ContentCard from '@/components/ContentCard';
+import ContentDetailModal from '@/components/ContentDetailModal';
 import CelebrationHandler from '@/components/CelebrationHandler';
 import { PlayCircle, CheckCircle2, Clock, Film, Tv, Star, Calendar, Trophy, Target } from 'lucide-react';
 import { formatRuntime } from '@/lib/utils';
@@ -25,8 +27,16 @@ export default function Home() {
   } = useTracker();
 
   const { showToast } = useToast();
+  const [selectedContent, setSelectedContent] = useState<MCUContent | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
   const watchingCount = allContent.filter(c => progress[c.id] === 'watching').length;
   const status = nextToWatch ? (progress[nextToWatch.id] || 'not_started') : 'not_started';
+
+  const handleOpenDetail = (content: MCUContent) => {
+    setSelectedContent(content);
+    setIsDetailModalOpen(true);
+  };
 
   // Handler for Next Up button with toast
   const handleNextUpClick = () => {
@@ -250,7 +260,7 @@ export default function Home() {
 
         {/* Filters Row */}
         <section className="bg-[#0d1117] rounded-xl p-4 border border-[#1c2128] mb-6">
-          <div className="flex flex-wrap items-center gap-4 text-sm">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-3 sm:gap-4 text-sm">
             {/* Watch Order */}
             <div className="flex items-center gap-2">
               <span className="text-gray-400">Watch Order:</span>
@@ -319,7 +329,7 @@ export default function Home() {
           /* Phase Sections for Release Order */
           <section className="space-y-4">
             {phases.map((phase) => (
-              <PhaseSection key={phase} phase={phase} />
+              <PhaseSection key={phase} phase={phase} onOpenDetail={handleOpenDetail} />
             ))}
           </section>
         ) : (
@@ -350,12 +360,19 @@ export default function Home() {
                   return true;
                 })
                 .map((content) => (
-                  <ContentCard key={content.id} content={content} />
+                  <ContentCard key={content.id} content={content} onOpenDetail={handleOpenDetail} />
                 ))}
             </div>
           </section>
         )}
       </main>
+
+      {/* Content Detail Modal */}
+      <ContentDetailModal
+        content={selectedContent}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+      />
     </div>
   );
 }
@@ -405,10 +422,10 @@ function PhaseFilter({
   const isAll = !selected || selected.length === 0;
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1 -mb-1 max-w-[calc(100vw-4rem)] sm:max-w-none">
       <button
         onClick={() => onToggle(0 as Phase)} // Clear all
-        className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${isAll ? 'bg-[#1c2128] text-white' : 'text-gray-400 hover:text-white'
+        className={`px-2.5 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${isAll ? 'bg-[#1c2128] text-white' : 'text-gray-400 hover:text-white'
           }`}
       >
         All
@@ -417,12 +434,12 @@ function PhaseFilter({
         <button
           key={phase}
           onClick={() => onToggle(phase)}
-          className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${selected?.includes(phase)
+          className={`px-2.5 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 min-w-[32px] text-center ${selected?.includes(phase)
             ? 'bg-[#1c2128] text-white'
             : 'text-gray-400 hover:text-white'
             }`}
         >
-          Phase {phase}
+          {phase}
         </button>
       ))}
     </div>

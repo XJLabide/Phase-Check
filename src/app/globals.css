@@ -75,6 +75,15 @@ body {
   background: var(--text-muted);
 }
 
+/* Scrollbar Hide Utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Glass Card */
 .glass-card {
   background: var(--glass-bg);
@@ -171,6 +180,14 @@ body {
 }
 
 .animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scaleIn {
   animation: scaleIn 0.2s ease-out;
 }
 
